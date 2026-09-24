@@ -127,10 +127,12 @@ export function WanderWiseApp({ view = "home" }: { view?: "home" | "explore" | "
   const [dismissed, setDismissed] = useState<Set<string>>(() => new Set());
   const [activeHotel, setActiveHotel] = useState<ActiveHotel>(null);
   const [activeDestination, setActiveDestination] = useState<Destination | null>(null);
+  const [activeDestinationIndex, setActiveDestinationIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
   const resultsRef = useRef<HTMLElement>(null);
   const heroRef = useRef<HTMLElement>(null);
+  const destinationGalleryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -196,6 +198,24 @@ export function WanderWiseApp({ view = "home" }: { view?: "home" | "explore" | "
     void sendInteraction(hotel, type);
   };
 
+  const updateActiveDestination = () => {
+    const gallery = destinationGalleryRef.current;
+    if (!gallery) return;
+    const galleryCenter = gallery.getBoundingClientRect().left + gallery.clientWidth / 2;
+    const cards = Array.from(gallery.querySelectorAll<HTMLElement>("[data-destination-index]"));
+    let nearestIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+    cards.forEach((card) => {
+      const bounds = card.getBoundingClientRect();
+      const distance = Math.abs(bounds.left + bounds.width / 2 - galleryCenter);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = Number(card.dataset.destinationIndex ?? 0);
+      }
+    });
+    setActiveDestinationIndex(nearestIndex);
+  };
+
   return (
     <main className="min-h-screen overflow-clip bg-background text-foreground">
       <div className="scroll-progress" style={{ transform: `scaleX(${progress / 100})` }} />
@@ -246,10 +266,10 @@ export function WanderWiseApp({ view = "home" }: { view?: "home" | "explore" | "
       {(isHome || isDestinations) && <section id="destinations" className="destinations-section">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
           <Reveal><div className="section-heading"><div><p className="label-caps text-accent">Journeys worth taking</p><h2 className="mt-3 max-w-[13ch] font-display text-4xl font-medium leading-tight sm:text-5xl">{isHome ? "A glimpse of where WanderWise can take you." : "Explore India, one beautiful stay at a time."}</h2></div><p className="max-w-md text-base leading-relaxed text-muted-foreground">From palace courtyards to quiet backwaters, discover places with a sense of story.</p></div></Reveal>
-          <div className={`destination-editorial ${isHome ? "home-destination-preview" : ""}`}>
+          <div ref={destinationGalleryRef} onScroll={updateActiveDestination} className={`destination-editorial ${isHome ? "home-destination-preview" : ""}`} aria-label="Destinations gallery">
             {(isHome ? destinations.slice(0, 3) : destinations).map((destination, index) => {
               const Icon = destination.icon;
-              return <Reveal key={destination.name} delay={index * 120} className={`destination-slot destination-slot-${index + 1}`}><button type="button" className="destination-card group" onClick={() => setActiveDestination(destination)}><img src={destination.image} alt={`${destination.name}: ${destination.note}`} loading="lazy" width={1408} height={1008} /><span className="destination-shade" /><span className="destination-copy"><span className="destination-icon"><Icon /></span><span><b>{destination.name}</b><small>{destination.note}</small></span><ArrowUpRight className="destination-arrow" /></span></button></Reveal>;
+              return <Reveal key={destination.name} delay={index * 90} className={`destination-slot ${activeDestinationIndex === index ? "is-active" : "is-receded"}`}><div data-destination-index={index} className="destination-card-frame"><button type="button" className="destination-card group" onFocus={() => setActiveDestinationIndex(index)} onClick={() => setActiveDestination(destination)}><img src={destination.image} alt={`${destination.name}: ${destination.note}`} loading="lazy" width={1408} height={1008} /><span className="destination-shade" /><span className="destination-copy"><span className="destination-icon"><Icon /></span><span><b>{destination.name}</b><small>{destination.note}</small></span><ArrowUpRight className="destination-arrow" /></span></button></div></Reveal>;
             })}
           </div>
           {isHome && <div className="mt-10 flex justify-center"><Button asChild variant="outline" className="rounded-full px-6"><Link to="/destinations">View all destinations<ArrowUpRight /></Link></Button></div>}
