@@ -10,6 +10,7 @@ import {
   Filter,
   Heart,
   MapPin,
+  Menu,
   Mountain,
   Plane,
   Search,
@@ -202,7 +203,7 @@ export function WanderWiseApp({ view = "home" }: { view?: "home" | "explore" | "
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-5 lg:px-8">
           <Link to="/" className="flex items-center gap-2.5" aria-label="WanderWise home"><span className="brand-mark"><Compass className="size-4" /></span><span className="font-display text-xl font-semibold">WanderWise</span></Link>
           <nav className="hidden items-center gap-8 text-sm md:flex" aria-label="Main navigation"><Link to="/" className="nav-link" activeProps={{ className: "nav-link is-active" }} activeOptions={{ exact: true }}>Home</Link><Link to="/explore" className="nav-link" activeProps={{ className: "nav-link is-active" }}>Explore</Link><Link to="/destinations" className="nav-link" activeProps={{ className: "nav-link is-active" }}>Destinations</Link><Link to="/approach" className="nav-link" activeProps={{ className: "nav-link is-active" }}>Our approach</Link></nav>
-          <Button type="button" variant="ghost" size="icon" className="rounded-full" aria-label="Profile"><UserRound /></Button>
+          <div className="flex items-center gap-1"><Sheet><SheetTrigger asChild><Button type="button" variant="ghost" size="icon" className="rounded-full md:hidden" aria-label="Open navigation"><Menu /></Button></SheetTrigger><SheetContent side="right" className="w-72"><SheetHeader><SheetTitle className="font-display text-2xl">WanderWise</SheetTitle><SheetDescription>Choose where you want to go next.</SheetDescription></SheetHeader><nav className="mt-10 flex flex-col gap-2" aria-label="Mobile navigation"><Button asChild variant="ghost" className="h-12 justify-start"><Link to="/">Home</Link></Button><Button asChild variant="ghost" className="h-12 justify-start"><Link to="/explore">Explore</Link></Button><Button asChild variant="ghost" className="h-12 justify-start"><Link to="/destinations">Destinations</Link></Button><Button asChild variant="ghost" className="h-12 justify-start"><Link to="/approach">Our approach</Link></Button></nav></SheetContent></Sheet><Button type="button" variant="ghost" size="icon" className="hidden rounded-full md:inline-flex" aria-label="Profile"><UserRound /></Button></div>
         </div>
       </header>
 
